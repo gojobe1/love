@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Наши 6 месяцев 💕</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --pink: #ffd1dc;
+    --peach: #ffe5d9;
+    --lavender: #e0c3fc;
+    --rose: #ff8fab;
+    --text: #5a3a52;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
+    background: linear-gradient(135deg, #ffd1dc 0%, #ffe5d9 35%, #e0c3fc 75%, #c8b6ff 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* Плавающие сердечки */
+  .hearts {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .heart {
+    position: absolute;
+    font-size: 20px;
+    opacity: 0.5;
+    animation: float 12s linear infinite;
+  }
+  @keyframes float {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.6; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* Экраны */
+  .screen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease;
+    overflow-y: auto;
+  }
+
+  .screen.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .screen-card {
+    width: 100%;
+    max-width: 520px;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 12px 40px rgba(255, 143, 171, 0.25);
+    padding: 40px 30px;
+    text-align: center;
+    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .screen-icon {
+    width: 80px; height: 80px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #ff8fab, #ffb3c6);
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(255, 143, 171, 0.4);
+  }
+
+  .screen h2 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #ff6b9d, #c06cc8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .screen p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+
+  /* Приветствие */
+  .privacy {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 18px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    margin: 20px 0;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .privacy:hover {
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  .privacy input {
+    display: none;
+  }
+
+  .checkmark {
+    width: 24px; height: 24px;
+    border-radius: 8px;
+    border: 2px solid #ffb3c6;
+    background: white;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    margin-top: 1px;
+  }
+
+  .privacy input:checked + .checkmark {
+    background: linear-gradient(135deg, #ff8fab, #ffb3c6);
+    border-color: #ff8fab;
+  }
+
+  .privacy input:checked + .checkmark::after {
+    content: '';
+    width: 6px; height: 11px;
+    border: solid white;
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+
+  .privacy-text {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .privacy-text strong {
+    display: block;
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+
+  /* Кнопки */
+  .buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    justify-content: center;
+    position: relative;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 16px 24px;
+    border: none;
+    border-radius: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .btn-yes {
+    background: linear-gradient(135deg, #ff8fab, #ff6b9d);
+    color: white;
+    box-shadow: 0 6px 20px rgba(255, 107, 157, 0.4);
+  }
+
+  .btn-yes:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(255, 107, 157, 0.5);
+  }
+
+  .btn-yes:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-no-wrapper {
+    position: relative;
+    flex: 1;
+    height: 52px;
+  }
+
+  .btn-no {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    color: var(--text);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    transition: all 0.15s ease;
+  }
+
+  /* Викторина */
+  .quiz-progress {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .quiz-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 143, 171, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .quiz-dot.active {
+    background: #ff8fab;
+    width: 24px;
+    border-radius: 4px;
+  }
+
+  .quiz-dot.done {
+    background: #ff8fab;
+  }
+
+  .quiz-question {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    line-height: 1.4;
+    min-height: 60px;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .quiz-option {
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 14px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    text-align: left;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    color: var(--text);
+  }
+
+  .quiz-option:hover {
+    background: rgba(255, 255, 255, 0.85);
+    transform: translateX(4px);
+  }
+
+  .quiz-option.correct {
+    background: linear-gradient(135deg, #a8e6cf, #7dd3c0);
+    color: white;
+    border-color: transparent;
+  }
+
+  .quiz-feedback {
+    margin-top: 20px;
+    padding: 14px;
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .quiz-feedback.show {
+    opacity: 1;
+  }
+
+  .quiz-feedback.success {
+    background: rgba(168, 230, 207, 0.5);
+    color: #2d7a5f;
+  }
+
+  /* Основной сайт */
+  #screen-main {
+    position: relative;
+    padding: 20px;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    padding: 20px 0;
+  }
+
+  .hero {
+    text-align: center;
+    padding: 60px 30px;
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 32px rgba(255, 143, 171, 0.2);
+    margin-bottom: 30px;
+  }
+
+  .hero-icon {
+    width: 80px; height: 80px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #ff8fab, #ffb3c6);
+    border-radius: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(255, 143, 171, 0.4);
+  }
+
+  .hero h1 {
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #ff6b9d, #c06cc8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero .subtitle {
+    font-size: 18px;
+    color: var(--text);
+    opacity: 0.7;
+    margin-bottom: 30px;
+  }
+
+  .counter {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 30px;
+  }
+
+  .counter-item {
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    padding: 18px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+  }
+
+  .counter-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--rose);
+    line-height: 1;
+  }
+
+  .counter-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 6px;
+    opacity: 0.7;
+  }
+
+  .section {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    padding: 40px 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(255, 143, 171, 0.15);
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 25px;
+  }
+
+  .section-icon {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .icon-pink { background: linear-gradient(135deg, #ff8fab, #ffb3c6); }
+  .icon-peach { background: linear-gradient(135deg, #ffb088, #ffd1a9); }
+  .icon-lavender { background: linear-gradient(135deg, #b794f6, #d6bcfa); }
+  .icon-mint { background: linear-gradient(135deg, #7dd3c0, #a8e6cf); }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  .photo {
+    aspect-ratio: 1;
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffd1dc, #e0c3fc);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+  }
+
+  .photo:hover { transform: scale(1.03); }
+
+  .photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-placeholder {
+    text-align: center;
+    color: white;
+    opacity: 0.8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .photo-placeholder svg {
+    width: 40px; height: 40px;
+    margin-bottom: 8px;
+  }
+
+  .photo-placeholder span {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  .reasons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .reason {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 16px 20px;
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    transition: transform 0.2s ease;
+  }
+
+  .reason:hover { transform: translateX(5px); }
+
+  .reason-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #ff8fab, #ffb3c6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .reason-text {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  .message {
+    text-align: center;
+    padding: 50px 30px;
+  }
+
+  .message-text {
+    font-size: 20px;
+    line-height: 1.6;
+    font-weight: 500;
+    margin-bottom: 20px;
+  }
+
+  .signature {
+    font-size: 16px;
+    opacity: 0.7;
+    font-style: italic;
+  }
+
+  .big-heart {
+    font-size: 60px;
+    margin: 20px 0;
+    animation: pulse 1.5s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 32px; }
+    .screen h2 { font-size: 26px; }
+    .counter { grid-template-columns: repeat(2, 1fr); }
+    .counter-value { font-size: 26px; }
+    .gallery { grid-template-columns: 1fr; }
+    .section { padding: 30px 20px; }
+    .screen-card { padding: 30px 20px; }
+    .buttons { flex-direction: column; }
+    .btn-no-wrapper { height: 52px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Плавающие сердечки -->
+<div class="hearts" id="hearts"></div>
+
+<!-- ЭКРАН 1: Приветствие -->
+<section class="screen active" id="screen-welcome">
+  <div class="screen-card">
+    <div class="screen-icon">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="white">
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+    </div>
+    <h2>Привет, солнышко 🌸</h2>
+    <p>Я сделал для тебя кое-что особенное в честь наших <strong>6 месяцев</strong> вместе. Но прежде чем войти — нужно согласие.</p>
+
+    <label class="privacy" for="privacy-check">
+      <input type="checkbox" id="privacy-check">
+      <span class="checkmark"></span>
+      <span class="privacy-text">
+        <strong>Политика любви 💕</strong>
+        Я подтверждаю, что готова открыть своё сердечко и продолжить этот маленький сюрприз. Обещаю улыбаться.
+      </span>
+    </label>
+
+    <div class="buttons">
+      <button class="btn btn-yes" id="btn-yes" disabled>Да, я готова ✨</button>
+      <div class="btn-no-wrapper" id="no-wrapper">
+        <button class="btn btn-no" id="btn-no">Нет 😌</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ЭКРАН 2: Викторина -->
+<section class="screen" id="screen-quiz">
+  <div class="screen-card">
+    <div class="screen-icon" style="background: linear-gradient(135deg, #b794f6, #d6bcfa);">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="white">
+        <path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/>
+      </svg>
+    </div>
+
+    <h2>Маленькая викторина 💭</h2>
+
+    <div class="quiz-progress">
+      <div class="quiz-dot active" data-step="0"></div>
+      <div class="quiz-dot" data-step="1"></div>
+      <div class="quiz-dot" data-step="2"></div>
+    </div>
+
+    <div class="quiz-question" id="quiz-question"></div>
+    <div class="quiz-options" id="quiz-options"></div>
+    <div class="quiz-feedback" id="quiz-feedback"></div>
+  </div>
+</section>
+
+<!-- ЭКРАН 3: Основной сайт -->
+<section class="screen" id="screen-main">
+  <div class="container">
+
+    <section class="hero">
+      <div class="hero-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="white">
+          <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+        </svg>
+      </div>
+      <h1>6 месяцев с тобой</h1>
+      <p class="subtitle">С 30 апреля 2026 💕</p>
+
+      <div class="counter">
+        <div class="counter-item">
+          <div class="counter-value" id="days">0</div>
+          <div class="counter-label">дней</div>
+        </div>
+        <div class="counter-item">
+          <div class="counter-value" id="hours">0</div>
+          <div class="counter-label">часов</div>
+        </div>
+        <div class="counter-item">
+          <div class="counter-value" id="minutes">0</div>
+          <div class="counter-label">минут</div>
+        </div>
+        <div class="counter-item">
+          <div class="counter-value" id="seconds">0</div>
+          <div class="counter-label">секунд</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <div class="section-icon icon-pink">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+            <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+          </svg>
+        </div>
+        Наши моменты
+      </div>
+      <div class="gallery">
+        <div class="photo">
+          <img src="photo1.jpg" alt="Наше фото 1" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="photo-placeholder" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+            <span>Фото 1</span>
+          </div>
+        </div>
+        <div class="photo">
+          <img src="photo2.jpg" alt="Наше фото 2" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="photo-placeholder" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+            <span>Фото 2</span>
+          </div>
+        </div>
+        <div class="photo">
+          <img src="photo3.jpg" alt="Наше фото 3" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="photo-placeholder" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+            <span>Фото 3</span>
+          </div>
+        </div>
+        <div class="photo">
+          <img src="photo4.jpg" alt="Наше фото 4" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+          <div class="photo-placeholder" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="white"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+            <span>Фото 4</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <div class="section-icon icon-peach">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </div>
+        За что я тебя люблю
+      </div>
+      <div class="reasons">
+        <div class="reason">
+          <div class="reason-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>
+          </div>
+          <div class="reason-text">За твою искреннюю улыбку</div>
+        </div>
+        <div class="reason">
+          <div class="reason-icon" style="background: linear-gradient(135deg, #ffb088, #ffd1a9);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+          </div>
+          <div class="reason-text">За наш смех и глупые шутки</div>
+        </div>
+        <div class="reason">
+          <div class="reason-icon" style="background: linear-gradient(135deg, #b794f6, #d6bcfa);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          </div>
+          <div class="reason-text">За то, какая ты настоящая</div>
+        </div>
+        <div class="reason">
+          <div class="reason-icon" style="background: linear-gradient(135deg, #7dd3c0, #a8e6cf);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          </div>
+          <div class="reason-text">За каждое мгновение рядом</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section message">
+      <div class="big-heart">💖</div>
+      <p class="message-text">
+        Эти 6 месяцев — самые счастливые в моей жизни.<br>
+        Спасибо, что ты есть. Ты — моё самое тёплое чудо.
+      </p>
+      <p class="signature">С любовью, навсегда твой ❤️</p>
+    </section>
+
+  </div>
+</section>
+
+<script>
+  // ========== Плавающие сердечки ==========
+  const heartsContainer = document.getElementById('hearts');
+  const heartEmojis = ['💕', '💖', '💗', '🌸', '✨'];
+  for (let i = 0; i < 15; i++) {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+    heart.style.left = Math.random() * 100 + '%';
+    heart.style.animationDelay = Math.random() * 12 + 's';
+    heart.style.animationDuration = (8 + Math.random() * 8) + 's';
+    heart.style.fontSize = (16 + Math.random() * 16) + 'px';
+    heartsContainer.appendChild(heart);
+  }
+
+  // ========== Переключение экранов ==========
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // ========== Экран приветствия ==========
+  const privacyCheck = document.getElementById('privacy-check');
+  const btnYes = document.getElementById('btn-yes');
+  const btnNo = document.getElementById('btn-no');
+  const noWrapper = document.getElementById('no-wrapper');
+
+  privacyCheck.addEventListener('change', () => {
+    btnYes.disabled = !privacyCheck.checked;
+  });
+
+  btnYes.addEventListener('click', () => {
+    if (!privacyCheck.checked) return;
+    showScreen('screen-quiz');
+    startQuiz();
+  });
+
+  // Убегающая кнопка "Нет"
+  function runAway() {
+    const wrapperRect = noWrapper.getBoundingClientRect();
+    // Случайное смещение в пределах окна
+    const maxX = window.innerWidth - 120;
+    const maxY = window.innerHeight - 60;
+    const newX = Math.random() * maxX;
+    const newY = Math.random() * maxY;
+
+    // Переключаем кнопку в fixed-позиционирование для свободы перемещения
+    btnNo.style.position = 'fixed';
+    btnNo.style.left = newX + 'px';
+    btnNo.style.top = newY + 'px';
+    btnNo.style.width = 'auto';
+    btnNo.style.padding = '14px 22px';
+    btnNo.style.zIndex = '100';
+    btnNo.style.transition = 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  }
+
+  btnNo.addEventListener('mouseenter', runAway);
+  btnNo.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    runAway();
+  });
+  btnNo.addEventListener('click', (e) => {
+    e.preventDefault();
+    runAway();
+  });
+
+  // ========== Викторина ==========
+  const quizData = [
+    {
+      question: 'Когда мы начали встречаться? 💫',
+      options: ['14 февраля', '30 апреля 2026', '1 января', 'В прошлой жизни'],
+      correct: 1,
+      feedback: 'Правильно! Именно в этот день началась наша история 🌸'
+    },
+    {
+      question: 'Где мы впервые поцеловались и что ты чувствовала? 💋',
+      options: [
+        'Не помню, было волшебно ✨',
+        'Сердце билось как сумасшедшее 💓',
+        'Хотела, чтобы этот момент длился вечно 🌙',
+        'Всё вышеперечисленное 💕'
+      ],
+      correct: 3,
+      feedback: 'Конечно всё сразу! Я запомнил каждое мгновение 💖'
+    },
+    {
+      question: 'Ты меня любишь? 🥺',
+      options: ['Да! 💖', 'Очень-очень 💕', 'Больше жизни 💗', 'Все варианты верны ✨'],
+      correct: 3,
+      feedback: 'Я тоже тебя люблю. Больше, чем можно сказать словами 💕'
+    }
+  ];
+
+  let currentQuestion = 0;
+
+  function startQuiz() {
+    currentQuestion = 0;
+    renderQuestion();
+  }
+
+  function renderQuestion() {
+    const q = quizData[currentQuestion];
+    document.getElementById('quiz-question').textContent = q.question;
+
+    const optionsContainer = document.getElementById('quiz-options');
+    optionsContainer.innerHTML = '';
+
+    q.options.forEach((opt, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'quiz-option';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => selectAnswer(idx, btn));
+      optionsContainer.appendChild(btn);
+    });
+
+    // Обновляем точки прогресса
+    document.querySelectorAll('.quiz-dot').forEach((dot, idx) => {
+      dot.classList.remove('active', 'done');
+      if (idx < currentQuestion) dot.classList.add('done');
+      if (idx === currentQuestion) dot.classList.add('active');
+    });
+
+    const feedback = document.getElementById('quiz-feedback');
+    feedback.classList.remove('show', 'success');
+    feedback.textContent = '';
+  }
+
+  function selectAnswer(idx, btn) {
+    const q = quizData[currentQuestion];
+    const feedback = document.getElementById('quiz-feedback');
+
+    // Блокируем остальные кнопки
+    document.querySelectorAll('.quiz-option').forEach(b => b.style.pointerEvents = 'none');
+
+    if (idx === q.correct) {
+      btn.classList.add('correct');
+      feedback.textContent = q.feedback;
+      feedback.classList.add('show', 'success');
+
+      setTimeout(() => {
+        currentQuestion++;
+        if (currentQuestion < quizData.length) {
+          renderQuestion();
+        } else {
+          // Все точки отмечены как пройденные
+          document.querySelectorAll('.quiz-dot').forEach(d => {
+            d.classList.remove('active');
+            d.classList.add('done');
+          });
+          setTimeout(() => {
+            showScreen('screen-main');
+            startCounter();
+          }, 800);
+        }
+      }, 1800);
+    } else {
+      // Неправильный ответ — лёгкая тряска
+      btn.style.animation = 'shake 0.4s ease';
+      btn.style.background = 'rgba(255, 180, 190, 0.5)';
+      setTimeout(() => {
+        btn.style.animation = '';
+        btn.style.background = '';
+        document.querySelectorAll('.quiz-option').forEach(b => b.style.pointerEvents = 'auto');
+      }, 600);
+    }
+  }
+
+  // Тряска для неправильного ответа
+  const shakeStyle = document.createElement('style');
+  shakeStyle.textContent = `
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+  `;
+  document.head.appendChild(shakeStyle);
+
+  // ========== Счётчик ==========
+  const startDate = new Date('2026-04-30T00:00:00');
+  let counterInterval;
+
+  function updateCounter() {
+    const now = new Date();
+    const diff = now - startDate;
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+    const minutes = Math.floor((diff / (1000 * 60)) % 60);
+    const seconds = Math.floor((diff / 1000) % 60);
+
+    document.getElementById('days').textContent = days;
+    document.getElementById('hours').textContent = hours;
+    document.getElementById('minutes').textContent = minutes;
+    document.getElementById('seconds').textContent = seconds;
+  }
+
+  function startCounter() {
+    if (counterInterval) return;
+    updateCounter();
+    counterInterval = setInterval(updateCounter, 1000);
+  }
+</script>
+
+</body>
+</html>
